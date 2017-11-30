@@ -17,24 +17,26 @@ class BattleShipServer:
         black.send(msg)
 
     # Runs the game loop between players
-    def runGameLoop (self, white, black):
+    def runGameLoop (self, white, black, stopEvent = None):
         # White & black follows after the chess idiom that white goes first
         whiteTurn = True
         currentPlayer = None
         while True:
+            # stop the thread if told to
+            if stopEvent is not None and stopEvent.is_set():
+                return
             # Determine turn
             currentPlayer = white if whiteTurn else black
             otherPlayer = black if whiteTurn else white
             currentPlayer.send("It's your turn, make a move\n")
             response = currentPlayer.recv(1024)
-            toPlayer = "Your move was: " + response
-            toOtherPlayer = "Your opponent's move was: " + response
+            toPlayer = "Your move was: " + response + '\n'
+            toOtherPlayer = "Your opponent's move was: " + response + '\n'
             currentPlayer.send(toPlayer)
             otherPlayer.send(toOtherPlayer)
-            print(response)
             whiteTurn = not whiteTurn
 
-    def startServer (self):
+    def startServer (self, stopEvent = None):
         s = socket.socket()
         host = self.host
         port = self.port
@@ -78,9 +80,8 @@ class BattleShipServer:
         # Notify clients about starting
         self.notifyAllPlayers(white, black, 'Both peers ready, starting game!\n')
         # Start game
-        self.runGameLoop(white, black)
+        self.runGameLoop(white, black, stopEvent)
         # Wait and then close connections
-        time.sleep(15)
         connection1.close()
         connection2.close()
         return;
