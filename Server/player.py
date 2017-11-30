@@ -9,9 +9,14 @@ class Player:
     #   connection --> a socket connection for sending and receiving data
     #   boardMap --> a dictionary mapping coordinate pairs to ships on the game board
     #   shipCount --> number of remaining ships player still has
+    #   previousShots --> a dictionary of all the places that the opponent has fired
     def __init__ (self, connection = None):
         self.connection = connection
         self.boardMap = None
+        self.previousShots = {
+            'misses': [],
+            'hits': []
+        }
         self.shipCount = 0
 
     def getGameBoard (self):
@@ -19,6 +24,7 @@ class Player:
         boardData = self.recv(1200)
         jsonData = json.loads(boardData)
         bMap = {}
+        shipCount = len (jsonData['ships'])
         for ship in jsonData['ships']:
             for coordStr in ship['coordinates']:
                 coords = coordStr.strip().split(',')

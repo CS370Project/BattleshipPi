@@ -12,4 +12,5 @@ with open ('ship.json', 'r') as fp:
     data = json.load(fp)
     pprint (data)
 
+print (data['ships'][0]['coordinates'])
 # pprint(data)
