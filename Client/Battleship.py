@@ -45,6 +45,7 @@ def main():
                     col = position[0]
                     row = position[1]
                     if col >= 400 and col <= 500 and row >= 340 and row <= 400:
+                        #Send player board for verification
                         ready = True
                         pygame.draw.rect(screen, BLACK, READY_BUTTON)
                     board.update(position, 3)
@@ -61,6 +62,7 @@ class Board(object):
         self.size = size
         self.target_grid = [[0 for x in range(size)] for y in range(size)]
         self.local_grid = [[0 for x in range(size)] for y in range(size)]
+        self.ship_count = {'Carrier': 1, 'Battleship': 2, 'Cruisers': 2, 'Destroyers': 2}
 
     def draw(self, screen):
         '''draws current state of board'''
@@ -109,7 +111,6 @@ class Board(object):
         if not row > self.size-1 and not column > self.size-1:
             self.target_grid[row][column] = value
 
-
 class Player(object):
     def __init__(self, player_num, name, comp, size):
         self.player_num = player_num
@@ -119,6 +120,13 @@ class Player(object):
 
     #def attack(self, receive_player_num, x, y):
 
+class Ship(object):
+    def __init__(self, coordinates, size, hp, ship_type, ship_id):
+        self.coordinates = coordinates
+        self.size = size
+        self.hp = hp
+        self.ship_type = ship_type
+        self.ship_id = ship_id
 
 if __name__ == '__main__':
     main()
