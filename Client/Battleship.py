@@ -48,6 +48,11 @@ def main():
     screen = pygame.display.set_mode(WINDOW_SIZE)
     done = False
     ready = False
+    vertical = False
+    carrier_place = False
+    battleship_place = False
+    cruiser_place = False
+    destroyer_place = False
     clock = pygame.time.Clock()
     board = Board(REGULAR)
 
@@ -77,13 +82,25 @@ def main():
 
     while not done:
         for event in pygame.event.get():
+            # Change ship placement direction. Only down and right arrows
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    vertical = True
+                elif event.key == pygame.K_RIGHT:
+                    vertical = False
+
+            # Check for player quiting the game
             if event.type == pygame.QUIT:
                 done = True
+
+            # Check for button selection
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 position = pygame.mouse.get_pos()
                 if not ready:
                     col = position[0]
                     row = position[1]
+                    grid_x = col // (WIDTH + MARGIN)
+                    grid_y = row // (HEIGHT + MARGIN)
                     if col >= 400 and col <= 500 and row >= 340 and row <= 400:
                         if carrier_ready == 0 and battleship_ready == 0 and cruiser_ready == 0 \
                             and destroyer_ready == 0:
@@ -91,28 +108,133 @@ def main():
                             ready = True
                             pygame.draw.rect(screen, BLACK, READY_BUTTON)
                     elif col >= 400 and col <= 500 and row >= 410 and row <= 470:
+                        carrier_place = True
+                        battleship_place = False
+                        cruiser_place = False
+                        destroyer_place = False
                         if carrier_ready > 0:
-                            carrier_ready-=1
+                            pygame.draw.rect(screen, WHITE, CARRIER_BUTTON)
+                            screen.blit(carrier_surface, CARRIER_BUTTON_TEXT)
+                        if battleship_ready > 0:
+                            pygame.draw.rect(screen, BLUE, BATTLESHIP_BUTTON)
+                            screen.blit(battleship_surface, BATTLESHIP_BUTTON_TEXT)
+                        if cruiser_ready > 0:
+                            pygame.draw.rect(screen, BLUE, CRUISER_BUTTON)
+                            screen.blit(cruiser_surface, CRUISER_BUTTON_TEXT)
+                        if destroyer_ready > 0:
+                            pygame.draw.rect(screen, BLUE, DESTROYER_BUTTON)
+                            screen.blit(destroyer_surface, DESTROYER_BUTTON_TEXT)
+                    elif col >= 400 and col <= 500 and row >= 480 and row <= 540:
+                        carrier_place = False
+                        battleship_place = True
+                        cruiser_place = False
+                        destroyer_place = False
+                        if carrier_ready > 0:
+                            pygame.draw.rect(screen, BLUE, CARRIER_BUTTON)
+                            screen.blit(carrier_surface, CARRIER_BUTTON_TEXT)
+                        if battleship_ready > 0:
+                            pygame.draw.rect(screen, WHITE, BATTLESHIP_BUTTON)
+                            screen.blit(battleship_surface, BATTLESHIP_BUTTON_TEXT)
+                        if cruiser_ready > 0:
+                            pygame.draw.rect(screen, BLUE, CRUISER_BUTTON)
+                            screen.blit(cruiser_surface, CRUISER_BUTTON_TEXT)
+                        if destroyer_ready > 0:
+                            pygame.draw.rect(screen, BLUE, DESTROYER_BUTTON)
+                            screen.blit(destroyer_surface, DESTROYER_BUTTON_TEXT)
+                    elif col >= 400 and col <= 500 and row >= 550 and row <= 610:
+                        carrier_place = False
+                        battleship_place = False
+                        cruiser_place = True
+                        destroyer_place = False
+                        if carrier_ready > 0:
+                            pygame.draw.rect(screen, BLUE, CARRIER_BUTTON)
+                            screen.blit(carrier_surface, CARRIER_BUTTON_TEXT)
+                        if battleship_ready > 0:
+                            pygame.draw.rect(screen, BLUE, BATTLESHIP_BUTTON)
+                            screen.blit(battleship_surface, BATTLESHIP_BUTTON_TEXT)
+                        if cruiser_ready > 0:
+                            pygame.draw.rect(screen, WHITE, CRUISER_BUTTON)
+                            screen.blit(cruiser_surface, CRUISER_BUTTON_TEXT)
+                        if destroyer_ready > 0:
+                            pygame.draw.rect(screen, BLUE, DESTROYER_BUTTON)
+                            screen.blit(destroyer_surface, DESTROYER_BUTTON_TEXT)
+                    elif col >= 400 and col <= 500 and row >= 620 and row <= 680:
+                        carrier_place = False
+                        battleship_place = False
+                        cruiser_place = False
+                        destroyer_place = True
+                        if carrier_ready > 0:
+                            pygame.draw.rect(screen, BLUE, CARRIER_BUTTON)
+                            screen.blit(carrier_surface, CARRIER_BUTTON_TEXT)
+                        if battleship_ready > 0:
+                            pygame.draw.rect(screen, BLUE, BATTLESHIP_BUTTON)
+                            screen.blit(battleship_surface, BATTLESHIP_BUTTON_TEXT)
+                        if cruiser_ready > 0:
+                            pygame.draw.rect(screen, BLUE, CRUISER_BUTTON)
+                            screen.blit(cruiser_surface, CRUISER_BUTTON_TEXT)
+                        if destroyer_ready > 0:
+                            pygame.draw.rect(screen, WHITE, DESTROYER_BUTTON)
+                            screen.blit(destroyer_surface, DESTROYER_BUTTON_TEXT)
+                    
+                    if carrier_place:
+                        if carrier_ready > 0:
+                            if vertical:
+                                if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 and grid_y + 4 <= 20:
+                                    for i in range(5):
+                                        board.update(grid_x, grid_y + i, 3)
+                                    carrier_ready-=1
+                            else:
+                                if grid_x >= 0 and grid_x + 4 <= 9 and grid_y >= 11 and grid_y <= 20:
+                                    for i in range(5):
+                                        board.update(grid_x + i, grid_y, 3)
+                                    carrier_ready-=1
                             if carrier_ready == 0:
                                 pygame.draw.rect(screen, BLACK, CARRIER_BUTTON)
-                    elif col >= 400 and col <= 500 and row >= 480 and row <= 540:
+                    if battleship_place:
                         if battleship_ready > 0:
-                            battleship_ready-=1
+                            if vertical:
+                                if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 and grid_y + 3 <= 20:
+                                    for i in range(4):
+                                        board.update(grid_x, grid_y + i, 3)
+                                    battleship_ready-=1
+                            else:
+                                if grid_x >= 0 and grid_x + 3 <= 9 and grid_y >= 11 and grid_y <= 20:
+                                    for i in range(4):
+                                        board.update(grid_x + i, grid_y, 3)
+                                    battleship_ready-=1
                             if battleship_ready == 0:
                                 pygame.draw.rect(screen, BLACK, BATTLESHIP_BUTTON)
-                    elif col >= 400 and col <= 500 and row >= 550 and row <= 610:
+                    if cruiser_place:
                         if cruiser_ready > 0:
-                            cruiser_ready-=1
+                            if vertical:
+                                if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 and grid_y + 2 <= 20:
+                                    for i in range(3):
+                                        board.update(grid_x, grid_y + i, 3)
+                                    cruiser_ready-=1
+                            else:
+                                if grid_x >= 0 and grid_x + 2 <= 9 and grid_y >= 11 and grid_y <= 20:
+                                    for i in range(3):
+                                        board.update(grid_x + i, grid_y, 3)
+                                    cruiser_ready-=1
                             if cruiser_ready == 0:
                                 pygame.draw.rect(screen, BLACK, CRUISER_BUTTON)
-                    elif col >= 400 and col <= 500 and row >= 620 and row <= 680:
+                    if destroyer_place:
                         if destroyer_ready > 0:
-                            destroyer_ready-=1
+                            if vertical:
+                                if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 and grid_y + 1 <= 20:
+                                    for i in range(2):
+                                        board.update(grid_x, grid_y + i, 3)
+                                    destroyer_ready-=1
+                            else:
+                                if grid_x >= 0 and grid_x + 1 <= 9 and grid_y >= 11 and grid_y <= 20:
+                                    for i in range(2):
+                                        board.update(grid_x + i, grid_y, 3)
+                                    destroyer_ready-=1
                             if destroyer_ready == 0:
                                 pygame.draw.rect(screen, BLACK, DESTROYER_BUTTON)
-                    board.update(position, 3)
+
                 else:
-                    board.update(position, 1)
+                    board.update(grid_x, grid_y, 1)
         board.draw(screen)
         clock.tick(60)
         pygame.display.flip()
@@ -167,11 +289,9 @@ class Board(object):
 
         return True
 
-    def update(self, pos, value):
+    def update(self, column, row, value):
         '''Updates client board to display server information'''
-        column = pos[0] // (WIDTH + MARGIN)
-        row = pos[1] // (HEIGHT + MARGIN)
-        print("Click ", pos, "Grid Coordinates: ", row, column)
+        print("Click Grid Coordinates: ", column, row)
         if value == 3:
             if row > self.size and not column > self.size-1 and not row > (self.size * 2):
                 self.local_grid[row-(self.size+1)][column] = value
