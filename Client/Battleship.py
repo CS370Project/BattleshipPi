@@ -70,7 +70,6 @@ def draw_placement(screen, direction):
     screen.blit(direction_surface, DIRECTION_TEXT)
     screen.blit(direction_tip_surface, DIRECTION_TIP_TEXT)
 
-
 def main():
     '''Main game initialization, loop, and close'''
     pygame.init()
@@ -400,14 +399,18 @@ class Board(object):
     def ship_present(self, column, row, ship_size, vertical):
         '''Checks for ships in current placement'''
         grid_y = column
-        grid_x = row - (self.size + 1)
-        if grid_y >= 0 and grid_y < self.size and grid_x >= 0 and grid_x <self.size:
+        grid_x = row - self.size - 1
+        for i in self.local_grid:
+            print(i)
+        if grid_y >= 0 and grid_y < self.size and grid_x >= 0 and grid_x < self.size:
             for i in range(ship_size):
                 if vertical:
-                    if self.local_grid[grid_x][grid_y + i] == 3:
+                    print("Check Grid Coordinates Vertical: COLUMN", grid_y, "ROW", grid_x + i, "VALUE", self.local_grid[grid_x + i][grid_y])
+                    if self.local_grid[grid_x + i][grid_y] == 3:
                         return True
                 else:
-                    if self.local_grid[grid_x + i][grid_y] == 3:
+                    print("Check Grid Coordinates Horizontal: COLUMN", grid_y + i, "ROW", grid_x, "VALUE", self.local_grid[grid_x][grid_y + i])
+                    if self.local_grid[grid_x][grid_y + i] == 3:
                         return True
         return False
 
