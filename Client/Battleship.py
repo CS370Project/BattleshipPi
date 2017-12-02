@@ -39,9 +39,9 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 
 CARRIER_COUNT = 1
-BATTLESHIP_COUNT = 2
+BATTLESHIP_COUNT = 1
 CRUISER_COUNT = 2
-DESTROYER_COUNT = 2
+DESTROYER_COUNT = 1
 
 CARRIER_SIZE = 5
 BATTLESHIP_SIZE = 4
@@ -229,25 +229,27 @@ def main():
                             if vertical:
                                 if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 \
                                     and grid_y + CARRIER_SIZE-1 <= 20:
-                                    coord = []
-                                    for i in range(CARRIER_SIZE):
-                                        board.update(grid_x, grid_y + i, 3)
-                                        coord.append([grid_x, grid_y + i])
-                                    ship = Ship(coord, CARRIER_SIZE, CARRIER_SIZE, 'Carrier', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    carrier_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, CARRIER_SIZE, vertical):
+                                        coord = []
+                                        for i in range(CARRIER_SIZE):
+                                            board.update(grid_x, grid_y + i, 3)
+                                            coord.append([grid_x, grid_y + i])
+                                        ship = Ship(coord, CARRIER_SIZE, CARRIER_SIZE, 'Carrier', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        carrier_ready-=1
                             else:
                                 if grid_x >= 0 and grid_x + CARRIER_SIZE-1 <= 9 \
                                     and grid_y >= 11 and grid_y <= 20:
-                                    coord = []
-                                    for i in range(CARRIER_SIZE):
-                                        board.update(grid_x + i, grid_y, 3)
-                                        coord.append([grid_x + i, grid_y])
-                                    ship = Ship(coord, CARRIER_SIZE, CARRIER_SIZE, 'Carrier', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    carrier_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, CARRIER_SIZE, vertical):
+                                        coord = []
+                                        for i in range(CARRIER_SIZE):
+                                            board.update(grid_x + i, grid_y, 3)
+                                            coord.append([grid_x + i, grid_y])
+                                        ship = Ship(coord, CARRIER_SIZE, CARRIER_SIZE, 'Carrier', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        carrier_ready-=1
                             if carrier_ready == 0:
                                 pygame.draw.rect(screen, BLACK, CARRIER_BUTTON)
                     if battleship_place:
@@ -255,25 +257,27 @@ def main():
                             if vertical:
                                 if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 \
                                     and grid_y + BATTLESHIP_SIZE-1 <= 20:
-                                    coord = []
-                                    for i in range(BATTLESHIP_SIZE):
-                                        board.update(grid_x, grid_y + i, 3)
-                                        coord.append([grid_x, grid_y + i])
-                                    ship = Ship(coord, BATTLESHIP_SIZE, BATTLESHIP_SIZE, 'Battleship', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    battleship_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, BATTLESHIP_SIZE, vertical):
+                                        coord = []
+                                        for i in range(BATTLESHIP_SIZE):
+                                            board.update(grid_x, grid_y + i, 3)
+                                            coord.append([grid_x, grid_y + i])
+                                        ship = Ship(coord, BATTLESHIP_SIZE, BATTLESHIP_SIZE, 'Battleship', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        battleship_ready-=1
                             else:
                                 if grid_x >= 0 and grid_x + BATTLESHIP_SIZE-1 <= 9 \
                                     and grid_y >= 11 and grid_y <= 20:
-                                    coord = []
-                                    for i in range(BATTLESHIP_SIZE):
-                                        board.update(grid_x + i, grid_y, 3)
-                                        coord.append([grid_x + i, grid_y])
-                                    ship = Ship(coord, BATTLESHIP_SIZE, BATTLESHIP_SIZE, 'Battleship', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    battleship_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, BATTLESHIP_SIZE, vertical):
+                                        coord = []
+                                        for i in range(BATTLESHIP_SIZE):
+                                            board.update(grid_x + i, grid_y, 3)
+                                            coord.append([grid_x + i, grid_y])
+                                        ship = Ship(coord, BATTLESHIP_SIZE, BATTLESHIP_SIZE, 'Battleship', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        battleship_ready-=1
                             if battleship_ready == 0:
                                 pygame.draw.rect(screen, BLACK, BATTLESHIP_BUTTON)
                     if cruiser_place:
@@ -281,25 +285,27 @@ def main():
                             if vertical:
                                 if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 \
                                     and grid_y + CRUISER_SIZE-1 <= 20:
-                                    coord = []
-                                    for i in range(CRUISER_SIZE):
-                                        board.update(grid_x, grid_y + i, 3)
-                                        coord.append([grid_x, grid_y + i])
-                                    ship = Ship(coord, CRUISER_SIZE, CRUISER_SIZE, 'Cruiser', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    cruiser_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, CRUISER_SIZE, vertical):
+                                        coord = []
+                                        for i in range(CRUISER_SIZE):
+                                            board.update(grid_x, grid_y + i, 3)
+                                            coord.append([grid_x, grid_y + i])
+                                        ship = Ship(coord, CRUISER_SIZE, CRUISER_SIZE, 'Cruiser', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        cruiser_ready-=1
                             else:
                                 if grid_x >= 0 and grid_x + CRUISER_SIZE-1 <= 9 \
                                     and grid_y >= 11 and grid_y <= 20:
-                                    coord = []
-                                    for i in range(CRUISER_SIZE):
-                                        board.update(grid_x + i, grid_y, 3)
-                                        coord.append([grid_x + i, grid_y])
-                                    ship = Ship(coord, CRUISER_SIZE, CRUISER_SIZE, 'Cruiser', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    cruiser_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, CRUISER_SIZE, vertical):
+                                        coord = []
+                                        for i in range(CRUISER_SIZE):
+                                            board.update(grid_x + i, grid_y, 3)
+                                            coord.append([grid_x + i, grid_y])
+                                        ship = Ship(coord, CRUISER_SIZE, CRUISER_SIZE, 'Cruiser', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        cruiser_ready-=1
                             if cruiser_ready == 0:
                                 pygame.draw.rect(screen, BLACK, CRUISER_BUTTON)
                     if destroyer_place:
@@ -307,25 +313,27 @@ def main():
                             if vertical:
                                 if grid_x >= 0 and grid_x <= 9 and grid_y >= 11 \
                                     and grid_y + DESTROYER_SIZE-1 <= 20:
-                                    coord = []
-                                    for i in range(DESTROYER_SIZE):
-                                        board.update(grid_x, grid_y + i, 3)
-                                        coord.append([grid_x, grid_y + i])
-                                    ship = Ship(coord, DESTROYER_SIZE, DESTROYER_SIZE, 'Destroyer', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    destroyer_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, DESTROYER_SIZE, vertical):
+                                        coord = []
+                                        for i in range(DESTROYER_SIZE):
+                                            board.update(grid_x, grid_y + i, 3)
+                                            coord.append([grid_x, grid_y + i])
+                                        ship = Ship(coord, DESTROYER_SIZE, DESTROYER_SIZE, 'Destroyer', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        destroyer_ready-=1
                             else:
                                 if grid_x >= 0 and grid_x + DESTROYER_SIZE-1 <= 9 \
                                     and grid_y >= 11 and grid_y <= 20:
-                                    coord = []
-                                    for i in range(DESTROYER_SIZE):
-                                        board.update(grid_x + i, grid_y, 3)
-                                        coord.append([grid_x + i, grid_y])
-                                    ship = Ship(coord, DESTROYER_SIZE, DESTROYER_SIZE, 'Destroyer', ship_id)
-                                    ship_id += 1
-                                    ship_collection.append(ship)
-                                    destroyer_ready-=1
+                                    if not board.ship_present(grid_x, grid_y, DESTROYER_SIZE, vertical):
+                                        coord = []
+                                        for i in range(DESTROYER_SIZE):
+                                            board.update(grid_x + i, grid_y, 3)
+                                            coord.append([grid_x + i, grid_y])
+                                        ship = Ship(coord, DESTROYER_SIZE, DESTROYER_SIZE, 'Destroyer', ship_id)
+                                        ship_id += 1
+                                        ship_collection.append(ship)
+                                        destroyer_ready-=1
                             if destroyer_ready == 0:
                                 pygame.draw.rect(screen, BLACK, DESTROYER_BUTTON)
 
@@ -388,6 +396,20 @@ class Board(object):
         #Checks that positioning is within grid bounds
         if not row > self.size-1 and not column > self.size-1:
             self.target_grid[row][column] = value
+
+    def ship_present(self, column, row, ship_size, vertical):
+        '''Checks for ships in current placement'''
+        grid_y = column
+        grid_x = row - (self.size + 1)
+        if grid_y >= 0 and grid_y < self.size and grid_x >= 0 and grid_x <self.size:
+            for i in range(ship_size):
+                if vertical:
+                    if self.local_grid[grid_x][grid_y + i] == 3:
+                        return True
+                else:
+                    if self.local_grid[grid_x + i][grid_y] == 3:
+                        return True
+        return False
 
 class Ship(object):
     '''Ship class'''
