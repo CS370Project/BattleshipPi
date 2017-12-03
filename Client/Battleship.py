@@ -114,6 +114,9 @@ def main(host, port, username):
     connection.settimeout(2)
     connection.connect((host, int(port)))
     connection_thread.start()
+    msg = connection.recv(140).decode("utf-8")
+    message.append(msg)
+    
 
     # Create GUI buttons for placement and ready
     pygame.draw.rect(screen, GREEN, READY_BUTTON)
@@ -430,16 +433,12 @@ class Board(object):
         '''Checks for ships in current placement'''
         grid_y = column
         grid_x = row - self.size - 1
-        for i in self.local_grid:
-            print(i)
         if grid_y >= 0 and grid_y < self.size and grid_x >= 0 and grid_x < self.size:
             for i in range(ship_size):
                 if vertical:
-                    print("Check Grid Coordinates Vertical: COLUMN", grid_y, "ROW", grid_x + i, "VALUE", self.local_grid[grid_x + i][grid_y])
                     if self.local_grid[grid_x + i][grid_y] == 3:
                         return True
                 else:
-                    print("Check Grid Coordinates Horizontal: COLUMN", grid_y + i, "ROW", grid_x, "VALUE", self.local_grid[grid_x][grid_y + i])
                     if self.local_grid[grid_x][grid_y + i] == 3:
                         return True
         return False
