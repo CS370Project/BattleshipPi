@@ -2,6 +2,8 @@
 import sys
 import socket
 import threading
+import json
+import base64
 import pygame
 from pygame.locals import *
 
@@ -65,10 +67,10 @@ def draw_messanger(screen, message):
 def draw_placement(screen, direction):
     '''Draw direction tip'''
     game_font = pygame.font.SysFont('Arial', 30)
-    tip_font = pygame.font.SysFont('Arial', 15)
+    tip_font = pygame.font.SysFont('Arial', 12)
     pygame.draw.rect(screen, WHITE, DIRECTION_TIP)
     direction_surface = game_font.render(direction, False, BLACK)
-    direction_tip_surface = tip_font.render('Press DOWN or UP arrows to change ship direction:', False, BLACK)
+    direction_tip_surface = tip_font.render('Press DOWN or RIGHT arrows to change ship direction:', False, BLACK)
     screen.blit(direction_surface, DIRECTION_TEXT)
     screen.blit(direction_tip_surface, DIRECTION_TIP_TEXT)
 
@@ -171,6 +173,10 @@ def main(host, port, username):
                         if carrier_ready == 0 and battleship_ready == 0 and cruiser_ready == 0 \
                             and destroyer_ready == 0:
                             #Send player board for verification
+                            board_send = json.dumps(board.local_grid).encode()
+                            connection.sendall(board_send)
+                            msg = connection.recv(140).decode("utf-8")
+                            message.append(msg)
                             ready = True
                             pygame.draw.rect(screen, BLACK, READY_BUTTON)
 
