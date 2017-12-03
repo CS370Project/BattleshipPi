@@ -1,5 +1,7 @@
 '''Main game runner'''
+import sys
 import socket
+import threading
 import pygame
 from pygame.locals import *
 
@@ -70,7 +72,7 @@ def draw_placement(screen, direction):
     screen.blit(direction_surface, DIRECTION_TEXT)
     screen.blit(direction_tip_surface, DIRECTION_TIP_TEXT)
 
-def main():
+def main(host, port, username):
     '''Main game initialization, loop, and close'''
     pygame.init()
     pygame.font.init()
@@ -90,6 +92,28 @@ def main():
     clock = pygame.time.Clock()
     board = Board(REGULAR)
 
+    def printSocketRec (sockname, connection, stopEvent):
+            while True:
+                if stopEvent.is_set():
+                    break
+                try:
+                    # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
+                    msg = connection.recv(254).decode('utf-8')
+                except:
+                    connection.close()
+                    return
+                for line in msg.splitlines():
+                    print ('{}: {}'.format(sockname, line))
+            connection.close()
+    # Create server connection
+    connection_stop = threading.Event()
+    connection = socket.socket()
+    connection_thread = threading.Thread(target=printSocketRec, args=(username, connection, connection_stop))
+    connection.settimeout(2)
+    connection.connect((host, int(port)))
+    connection_thread.start()
+
+    # Create GUI buttons for placement and ready
     pygame.draw.rect(screen, GREEN, READY_BUTTON)
     ready_surface = game_font.render('READY', False, BLACK)
     screen.blit(ready_surface, READY_BUTTON_TEXT)
@@ -425,4 +449,4 @@ class Ship(object):
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
