@@ -10,14 +10,25 @@ class BattleShipServer:
     def __init__(self, host = '', port = 8080):
         self.host = host
         self.port = port
+        self.white = None
+        self.black = None
     
     # Sends a msg to both client
-    def notifyAllPlayers (self, white, black, msg):
-        white.send(msg)
-        black.send(msg)
+    def notifyAllPlayers (self, msg):
+        self.white.send(msg)
+        self.black.send(msg)
+
+    def getCoordsFromStr (moveStr):
+        coords = coordStr.strip().split(',')
+        x = int(coords[0])
+        y = int(coords[1])
+        return (x,y)
+
+    def validateMove (move, player):
+        return not (move in player.previousShots['hits'] or move in player.previousShots['miss'])
 
     # Runs the game loop between players
-    def runGameLoop (self, white, black, stopEvent = None):
+    def runGameLoop (self, stopEvent = None):
         # White & black follows after the chess idiom that white goes first
         whiteTurn = True
         currentPlayer = None
@@ -26,14 +37,42 @@ class BattleShipServer:
             if stopEvent is not None and stopEvent.is_set():
                 return
             # Determine turn
-            currentPlayer = white if whiteTurn else black
-            otherPlayer = black if whiteTurn else white
+            currentPlayer = self.white if whiteTurn else self.black
+            otherPlayer = self.black if whiteTurn else self.white
             currentPlayer.send("It's your turn, make a move\n")
-            response = currentPlayer.recv(1024)
-            toPlayer = "Your move was: " + response + '\n'
-            toOtherPlayer = "Your opponent's move was: " + response + '\n'
-            currentPlayer.send(toPlayer)
-            otherPlayer.send(toOtherPlayer)
+            move = getCoordsFromStr(currentPlayer.recv(16))
+            # invalid move
+            if validateMove(move, otherPlayer) is False:
+                currentPlayer.send('You have already fired a shot at this location try somewhere else\n')
+                continue
+            # hit a ship
+            if move in otherPlayer.boardMap:
+                currentPlayer.send('hit\n')
+                # Update the previous shots and ship hp          
+                ship = otherPlayer.boardMap[move]
+                ship['hp'] = ship['hp'] - 1
+                otherPlayer.previousShots['hits'].append(move)
+                # ship sunk
+                if ship['hp'] is 0:
+                    currentPlayer.send("You sunk your opponent's {}\n".format(ship['name']))
+                    otherPlayer.send("Your opponent sunk your {}\n".format(ship['name']))
+                    otherPlayer.shipCount = otherPlayer.shipCount - 1
+                    # game over currentPlayer wins
+                    if otherPlayer.shipCount is 0:
+                        notifyAllPlayers('Game Over\n')
+                        currentPlayer.send('Congratulations you win!\n')
+                        otherPlayer.send('Sorry you lost, better luck next time!\n')
+                        return
+                else:
+                    currentPlayer.send("You hit your opponent's {}\n".format(ship['name']))
+                    otherPlayer.send("Your opponent hit your {}\n".format(ship['name']))
+            # miss
+            else:
+                currentPlayer.send('miss\n')
+                otherPlayer.previousShots['misses'].append(move)
+                currentPlayer.send('You missed at coordinates: {}\n'.format(move))
+                otherPlayer.send('Your opponent missed at coordinates: {}\n'.format(move))
+            # Switch turns
             whiteTurn = not whiteTurn
 
     def startServer (self, stopEvent = None):
@@ -53,10 +92,10 @@ class BattleShipServer:
         print ('Client {} is connected'.format(addr2))
         # Create players
         playerSwitch = 'white' if randint(0, 1) is 0 else 'black'
-        white = Player(connection1) if playerSwitch is 'white' else Player(connection2)
-        black = Player(connection1) if playerSwitch is 'black' else Player(connection2)
+        self.white = Player(connection1) if playerSwitch is 'white' else Player(connection2)
+        self.black = Player(connection1) if playerSwitch is 'black' else Player(connection2)
         # Notify players 
-        self.notifyAllPlayers(white, black, 'Connected to server, both peers have connected\n')
+        self.notifyAllPlayers('Connected to server, both peers have connected\n')
         # Ready function
         readys = 0
         def ready (player):
@@ -72,15 +111,15 @@ class BattleShipServer:
                     player.send('Ready received!\n')   
                     return
         # Use aysnc module to ask users for ready        
-        async.asyncCall(ready, (white,))
-        async.asyncCall(ready, (black,))
+        async.asyncCall(ready, (self.white,))
+        async.asyncCall(ready, (self.black,))
         # Wait for both clients to be ready to start
         while readys != 2:
             pass
         # Notify clients about starting
-        self.notifyAllPlayers(white, black, 'Both peers ready, starting game!\n')
+        self.notifyAllPlayers('Both peers ready, starting game!\n')
         # Start game
-        self.runGameLoop(white, black, stopEvent)
+        self.runGameLoop(stopEvent)
         # Wait and then close connections
         connection1.close()
         connection2.close()
