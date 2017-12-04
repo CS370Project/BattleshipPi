@@ -19,13 +19,13 @@ class BattleShipServer:
         self.black.send(msg)
 
     def getCoordsFromStr (moveStr):
-        coords = coordStr.strip().split(',')
+        coords = moveStr.strip().split(',')
         x = int(coords[0])
         y = int(coords[1])
         return (x,y)
 
     def validateMove (move, player):
-        return not (move in player.previousShots['hits'] or move in player.previousShots['miss'])
+        return not (move in player.previousShots['hits'] or move in player.previousShots['misses'])
 
     # Runs the game loop between players
     def runGameLoop (self, stopEvent = None):
