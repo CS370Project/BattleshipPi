@@ -40,7 +40,7 @@ class Player:
     # Sends a msg to the client socket
     def send (self, msg):
         msg = struct.pack('>I', len(msg)) + msg
-        sock.sendall(msg.encode())
+        self.connection.sendall(msg.encode())
 
     # Receives a msg on the client socket as a string
     def recv (self, size):
