@@ -3,6 +3,7 @@ import pprint
 import async
 import socket
 import time
+import struct
 
 class Player:
     # Player attributes
@@ -39,8 +40,8 @@ class Player:
 
     # Sends a msg to the client socket
     def send (self, msg):
-        msg = struct.pack('>I', len(msg)) + msg
-        self.connection.sendall(msg.encode())
+        msg = struct.pack('>I', len(msg)) + msg.encode()
+        self.connection.sendall(msg)
 
     # Receives a msg on the client socket as a string
     def recv (self, size):

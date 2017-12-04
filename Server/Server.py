@@ -89,6 +89,7 @@ class BattleShipServer:
         connection1.send('Connected to server, waiting on your opponent'.encode())
         # Accept second client
         connection2, addr2 = s.accept()
+        connection2.send('Connected to server, waiting on your opponent'.encode())
         print ('Client {} is connected'.format(addr2))
         # Create players
         playerSwitch = 'white' if randint(0, 1) is 0 else 'black'
@@ -102,7 +103,7 @@ class BattleShipServer:
             nonlocal readys
             # wait for ready
             while True:
-                player.send('Are you ready to start?')            
+                player.send('Waiting on game board')            
                 # Receive no more than 1024 bytes
                 board = player.getGameBoard()
                 if board is not None:
