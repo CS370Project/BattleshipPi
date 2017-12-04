@@ -18,13 +18,13 @@ class BattleShipServer:
         self.white.send(msg)
         self.black.send(msg)
 
-    def getCoordsFromStr (moveStr):
+    def getCoordsFromStr (self, moveStr):
         coords = moveStr.strip().split(',')
         x = int(coords[0])
         y = int(coords[1])
         return (x,y)
 
-    def validateMove (move, player):
+    def validateMove (self, move, player):
         return not (move in player.previousShots['hits'] or move in player.previousShots['misses'])
 
     # Runs the game loop between players
@@ -42,7 +42,7 @@ class BattleShipServer:
             currentPlayer.send("It's your turn, make a move")
             move = self.getCoordsFromStr(currentPlayer.recv(16))
             # invalid move
-            if validateMove(move, otherPlayer) is False:
+            if self.validateMove(move, otherPlayer) is False:
                 currentPlayer.send('You have already fired a shot at this location try somewhere else')
                 continue
             # hit a ship
@@ -59,7 +59,7 @@ class BattleShipServer:
                     otherPlayer.shipCount = otherPlayer.shipCount - 1
                     # game over currentPlayer wins
                     if otherPlayer.shipCount is 0:
-                        notifyAllPlayers('Game Over')
+                        self.notifyAllPlayers('Game Over')
                         currentPlayer.send('Congratulations you win!')
                         otherPlayer.send('Sorry you lost, better luck next time!')
                         return

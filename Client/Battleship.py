@@ -102,7 +102,7 @@ def main(host, port, username):
                 break
             try:
                 # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-                msg = connection.recv(140).decode('utf-8')
+                msg = connection.recv_msg(connection).decode('utf-8')
             except:
                 pass
             for line in msg.splitlines():
@@ -375,11 +375,12 @@ def main(host, port, username):
 
                 else:
                     if turn:
-                        shot = str(grid_x) + ", " + str(grid_y)
-                        connection.sendall(shot.encode())
+                        shot = str(grid_x) + ', ' + str(grid_y)
+                        print(shot)
+                        connection.send(shot.encode())
                         board.update(grid_x, grid_y, 1)
                         if grid_x >=0 and grid_x < 10 and grid_y >=0 and grid_y < 10:
-                            message.append(str(GRID_COORD[grid_x]) + "" + str(grid_y+1))
+                            message.append("Fire at: " + str(GRID_COORD[grid_x]) + "" + str(grid_y+1))
         board.draw(screen)
         clock.tick(60)
         pygame.display.flip()
