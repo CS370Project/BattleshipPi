@@ -95,28 +95,32 @@ def main(host, port, username):
     board = Board(REGULAR)
 
     def printSocketRec (sockname, connection, stopEvent):
-            while True:
-                if stopEvent.is_set():
-                    break
-                try:
-                    # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-                    msg = connection.recv(254).decode('utf-8')
-                except:
-                    connection.close()
-                    return
-                for line in msg.splitlines():
-                    print ('{}: {}'.format(sockname, line))
-            connection.close()
+        nonlocal message
+        while True:
+            if stopEvent.is_set():
+                break
+            try:
+                # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
+                msg = connection.recv(140).decode('utf-8')
+            except:
+                pass
+            for line in msg.splitlines():
+                message.append('{}: {}'.format(sockname, line))
+        connection.close()
+    
     # Create server connection
     connection_stop = threading.Event()
     connection = socket.socket()
     connection_thread = threading.Thread(target=printSocketRec, args=(username, connection, connection_stop))
-    connection.settimeout(2)
+    connection.settimeout(1000)
     connection.connect((host, int(port)))
     connection_thread.start()
-    msg = connection.recv(140).decode("utf-8")
-    message.append(msg)
-    
+    # Get connect msg
+    # msg = connection.recv(140).decode("utf-8")
+    # message.append(msg)
+    # # Get ready msg
+    # msg = connection.recv(140).decode("utf-8")
+    # message.append(msg)
 
     # Create GUI buttons for placement and ready
     pygame.draw.rect(screen, GREEN, READY_BUTTON)
@@ -178,8 +182,8 @@ def main(host, port, username):
                             #Send player board for verification
                             board_send = json.dumps(board.local_grid).encode()
                             connection.sendall(board_send)
-                            msg = connection.recv(140).decode("utf-8")
-                            message.append(msg)
+                            # msg = connection.recv(140).decode("utf-8")
+                            # message.append(msg)
                             ready = True
                             pygame.draw.rect(screen, BLACK, READY_BUTTON)
 

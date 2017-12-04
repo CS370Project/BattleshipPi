@@ -76,24 +76,24 @@ class BattleShipServer:
             # Switch turns
             whiteTurn = not whiteTurn
 
-    def gameBoardTest (self, player):
-        data = None
-        with open ('ship.json', 'r') as fp:
-            data = json.load(fp)
-        bMap = {}
-        shipCount = len (data['ships'])
-        for ship in data['ships']:
-            for coordStr in ship['coordinates']:
-                coords = coordStr.strip().split(',')
-                x = int(coords[0])
-                y = int(coords[1])
-                if not (x,y) in bMap:
-                    bMap[(x,y)] = ship
-                else:
-                    print ('Error two ships in the same spot')
-        player.boardMap = bMap
-        player.shipCount = shipCount
-        return bMap
+    # def gameBoardTest (self, player):
+    #     data = None
+    #     with open ('ship.json', 'r') as fp:
+    #         data = json.load(fp)
+    #     bMap = {}
+    #     shipCount = len (data['ships'])
+    #     for ship in data['ships']:
+    #         for coordStr in ship['coordinates']:
+    #             coords = coordStr.strip().split(',')
+    #             x = int(coords[0])
+    #             y = int(coords[1])
+    #             if not (x,y) in bMap:
+    #                 bMap[(x,y)] = ship
+    #             else:
+    #                 print ('Error two ships in the same spot')
+    #     player.boardMap = bMap
+    #     player.shipCount = shipCount
+    #     return bMap
 
     def startServer (self, stopEvent = None):
         s = socket.socket()
@@ -106,7 +106,7 @@ class BattleShipServer:
         # Accept first client
         connection1, addr1 = s.accept()
         print ('Client {} is connected'.format(addr1))
-        connection1.send('Connected to server, waiting on your opponent'.encode())
+        # connection1.send('Connected to server, waiting on your opponent'.encode())
         # Accept second client
         connection2, addr2 = s.accept()
         print ('Client {} is connected'.format(addr2))
@@ -123,10 +123,8 @@ class BattleShipServer:
             # wait for ready
             while True:
                 player.send('Are you ready to start?')            
-                # Receive no more than 1024 bytes
-                ''' Removed for testing: board = player.getGameBoard() '''
-                board = self.gameBoardTest(player)
-                ''' ---------- '''
+                ''' Removed for testing: board = self.gameBoardTest(player) '''
+                board = player.getGameBoard()
                 if board is not None:
                     readys += 1
                     player.board = board

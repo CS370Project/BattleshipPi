@@ -23,6 +23,7 @@ class Player:
         # Receive board data as a string
         boardData = self.recv(1200)
         jsonData = json.loads(boardData)
+        pprint.pprint (jsonData)
         bMap = {}
         shipCount = len (jsonData['ships'])
         for ship in jsonData['ships']:
