@@ -100,11 +100,8 @@ def main(host, port, username):
         while True:
             if stopEvent.is_set():
                 break
-            try:
-                # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-                msg = connection.recv_msg(connection).decode('utf-8')
-            except:
-                pass
+            # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
+            msg = connection.recv_msg(connection).decode('utf-8')
             for line in msg.splitlines():
                 message.append('{}: {}'.format(sockname, line))
         connection.close()
