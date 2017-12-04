@@ -83,6 +83,7 @@ def main(host, port, username):
     screen = pygame.display.set_mode(WINDOW_SIZE)
     done = False
     ready = False
+    turn = False
     vertical = False
     carrier_place = False
     battleship_place = False
@@ -95,27 +96,27 @@ def main(host, port, username):
     board = Board(REGULAR)
 
     def printSocketRec (sockname, connection, stopEvent):
-            while True:
-                if stopEvent.is_set():
-                    break
-                try:
-                    # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-                    msg = connection.recv(254).decode('utf-8')
-                except:
-                    connection.close()
-                    return
-                for line in msg.splitlines():
-                    print ('{}: {}'.format(sockname, line))
-            connection.close()
+        nonlocal message
+        while True:
+            if stopEvent.is_set():
+                break
+            try:
+                # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
+                msg = connection.recv(140).decode('utf-8')
+            except:
+                pass
+            for line in msg.splitlines():
+                message.append('{}: {}'.format(sockname, line))
+        connection.close()
     # Create server connection
     connection_stop = threading.Event()
     connection = socket.socket()
     connection_thread = threading.Thread(target=printSocketRec, args=(username, connection, connection_stop))
-    connection.settimeout(2)
+    connection.settimeout(1000)
     connection.connect((host, int(port)))
     connection_thread.start()
-    msg = connection.recv(140).decode("utf-8")
-    message.append(msg)
+    #msg = connection.recv(140).decode("utf-8")
+    #message.append(msg)
     
 
     # Create GUI buttons for placement and ready
@@ -176,10 +177,11 @@ def main(host, port, username):
                         if carrier_ready == 0 and battleship_ready == 0 and cruiser_ready == 0 \
                             and destroyer_ready == 0:
                             #Send player board for verification
-                            board_send = json.dumps(board.local_grid).encode()
+                            
+                            board_send = json.dumps([ship.__dict__ for ship in ship_collection]).encode()
                             connection.sendall(board_send)
-                            msg = connection.recv(140).decode("utf-8")
-                            message.append(msg)
+                            #msg = connection.recv(140).decode("utf-8")
+                            #message.append(msg)
                             ready = True
                             pygame.draw.rect(screen, BLACK, READY_BUTTON)
 
@@ -265,7 +267,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(CARRIER_SIZE):
                                             board.update(grid_x, grid_y + i, 3)
-                                            coord.append([grid_x, grid_y + i])
+                                            coord.append([grid_x, grid_y + i - 11])
                                         ship = Ship(coord, CARRIER_SIZE, CARRIER_SIZE, 'Carrier', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -277,7 +279,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(CARRIER_SIZE):
                                             board.update(grid_x + i, grid_y, 3)
-                                            coord.append([grid_x + i, grid_y])
+                                            coord.append([grid_x + i, grid_y - 11])
                                         ship = Ship(coord, CARRIER_SIZE, CARRIER_SIZE, 'Carrier', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -293,7 +295,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(BATTLESHIP_SIZE):
                                             board.update(grid_x, grid_y + i, 3)
-                                            coord.append([grid_x, grid_y + i])
+                                            coord.append([grid_x, grid_y + i - 11])
                                         ship = Ship(coord, BATTLESHIP_SIZE, BATTLESHIP_SIZE, 'Battleship', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -305,7 +307,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(BATTLESHIP_SIZE):
                                             board.update(grid_x + i, grid_y, 3)
-                                            coord.append([grid_x + i, grid_y])
+                                            coord.append([grid_x + i, grid_y - 11])
                                         ship = Ship(coord, BATTLESHIP_SIZE, BATTLESHIP_SIZE, 'Battleship', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -321,7 +323,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(CRUISER_SIZE):
                                             board.update(grid_x, grid_y + i, 3)
-                                            coord.append([grid_x, grid_y + i])
+                                            coord.append([grid_x, grid_y + i - 11])
                                         ship = Ship(coord, CRUISER_SIZE, CRUISER_SIZE, 'Cruiser', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -333,7 +335,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(CRUISER_SIZE):
                                             board.update(grid_x + i, grid_y, 3)
-                                            coord.append([grid_x + i, grid_y])
+                                            coord.append([grid_x + i, grid_y - 11])
                                         ship = Ship(coord, CRUISER_SIZE, CRUISER_SIZE, 'Cruiser', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -349,7 +351,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(DESTROYER_SIZE):
                                             board.update(grid_x, grid_y + i, 3)
-                                            coord.append([grid_x, grid_y + i])
+                                            coord.append([grid_x, grid_y + i - 11])
                                         ship = Ship(coord, DESTROYER_SIZE, DESTROYER_SIZE, 'Destroyer', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)
@@ -361,7 +363,7 @@ def main(host, port, username):
                                         coord = []
                                         for i in range(DESTROYER_SIZE):
                                             board.update(grid_x + i, grid_y, 3)
-                                            coord.append([grid_x + i, grid_y])
+                                            coord.append([grid_x + i, grid_y - 11])
                                         ship = Ship(coord, DESTROYER_SIZE, DESTROYER_SIZE, 'Destroyer', ship_id)
                                         ship_id += 1
                                         ship_collection.append(ship)

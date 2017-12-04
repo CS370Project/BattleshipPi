@@ -40,7 +40,7 @@ class BattleShipServer:
             currentPlayer = self.white if whiteTurn else self.black
             otherPlayer = self.black if whiteTurn else self.white
             currentPlayer.send("It's your turn, make a move")
-            move = getCoordsFromStr(currentPlayer.recv(16))
+            move = self.getCoordsFromStr(currentPlayer.recv(16))
             # invalid move
             if validateMove(move, otherPlayer) is False:
                 currentPlayer.send('You have already fired a shot at this location try somewhere else')

@@ -24,10 +24,9 @@ class Player:
         boardData = self.recv(1200)
         jsonData = json.loads(boardData)
         bMap = {}
-        shipCount = len (jsonData['ships'])
-        for ship in jsonData['ships']:
-            for coordStr in ship['coordinates']:
-                coords = coordStr.strip().split(',')
+        shipCount = len (jsonData)
+        for ship in jsonData:
+            for coords in ship['coordinates']:
                 x = int(coords[0])
                 y = int(coords[1])
                 if not (x,y) in bMap:
@@ -35,6 +34,7 @@ class Player:
                 else:
                     print ('Error two ships in the same spot')
         self.boardMap = bMap
+        self.shipCount = shipCount
         return bMap
 
     # Sends a msg to the client socket
