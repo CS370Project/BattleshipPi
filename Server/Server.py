@@ -2,6 +2,7 @@ import socket
 import time
 import async
 import sys
+import json
 from random import randint
 from player import Player
 
@@ -18,14 +19,14 @@ class BattleShipServer:
         self.white.send(msg)
         self.black.send(msg)
 
-    def getCoordsFromStr (moveStr):
-        coords = coordStr.strip().split(',')
+    def getCoordsFromStr (self, moveStr):
+        coords = moveStr.strip().split(',')
         x = int(coords[0])
         y = int(coords[1])
         return (x,y)
 
-    def validateMove (move, player):
-        return not (move in player.previousShots['hits'] or move in player.previousShots['miss'])
+    def validateMove (self, move, player):
+        return not (move in player.previousShots['hits'] or move in player.previousShots['misses'])
 
     # Runs the game loop between players
     def runGameLoop (self, stopEvent = None):
@@ -40,9 +41,9 @@ class BattleShipServer:
             currentPlayer = self.white if whiteTurn else self.black
             otherPlayer = self.black if whiteTurn else self.white
             currentPlayer.send("It's your turn, make a move\n")
-            move = getCoordsFromStr(currentPlayer.recv(16))
+            move = self.getCoordsFromStr(currentPlayer.recv(16))
             # invalid move
-            if validateMove(move, otherPlayer) is False:
+            if self.validateMove(move, otherPlayer) is False:
                 currentPlayer.send('You have already fired a shot at this location try somewhere else\n')
                 continue
             # hit a ship
@@ -59,7 +60,7 @@ class BattleShipServer:
                     otherPlayer.shipCount = otherPlayer.shipCount - 1
                     # game over currentPlayer wins
                     if otherPlayer.shipCount is 0:
-                        notifyAllPlayers('Game Over\n')
+                        self.notifyAllPlayers('Game Over\n')
                         currentPlayer.send('Congratulations you win!\n')
                         otherPlayer.send('Sorry you lost, better luck next time!\n')
                         return
@@ -74,6 +75,25 @@ class BattleShipServer:
                 otherPlayer.send('Your opponent missed at coordinates: {}\n'.format(move))
             # Switch turns
             whiteTurn = not whiteTurn
+
+    def gameBoardTest (self, player):
+        data = None
+        with open ('ship.json', 'r') as fp:
+            data = json.load(fp)
+        bMap = {}
+        shipCount = len (data['ships'])
+        for ship in data['ships']:
+            for coordStr in ship['coordinates']:
+                coords = coordStr.strip().split(',')
+                x = int(coords[0])
+                y = int(coords[1])
+                if not (x,y) in bMap:
+                    bMap[(x,y)] = ship
+                else:
+                    print ('Error two ships in the same spot')
+        player.boardMap = bMap
+        player.shipCount = shipCount
+        return bMap
 
     def startServer (self, stopEvent = None):
         s = socket.socket()
@@ -102,12 +122,14 @@ class BattleShipServer:
             nonlocal readys
             # wait for ready
             while True:
-                player.send('Are you ready to start?\n')            
+                player.send('Are you ready to start?\n')    
+                response = player.recv(16)    
                 # Receive no more than 1024 bytes
-                board = player.getGameBoard()
+                ''' Removed for testing: board = player.getGameBoard() '''
+                board = self.gameBoardTest(player)
+                ''' ---------- '''
                 if board is not None:
                     readys += 1
-                    player.board = board
                     player.send('Ready received!\n')   
                     return
         # Use aysnc module to ask users for ready        
@@ -121,6 +143,7 @@ class BattleShipServer:
         # Start game
         self.runGameLoop(stopEvent)
         # Wait and then close connections
+        time.sleep(3)
         connection1.close()
         connection2.close()
         return;

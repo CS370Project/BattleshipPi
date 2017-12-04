@@ -35,6 +35,7 @@ class Player:
                 else:
                     print ('Error two ships in the same spot')
         self.boardMap = bMap
+        self.shipCount = shipCount
         return bMap
 
     # Sends a msg to the client socket
