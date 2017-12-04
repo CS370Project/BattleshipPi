@@ -83,13 +83,17 @@ class BattleShipServer:
         s.listen(5)
         print ('Server listening on {}, port {}'.format(host, port))
         # Get the client connections
+        def send_msg(sock, msg):
+            # Prefix each message with a 4-byte length (network byte order)
+            msg = struct.pack('>I', len(msg)) + msg.encode()
+            sock.sendall(msg)
         # Accept first client
         connection1, addr1 = s.accept()
         print ('Client {} is connected'.format(addr1))
-        connection1.send('Connected to server, waiting on your opponent'.encode())
+        send_msg(connection1, 'Connected to server, waiting on your opponent')
         # Accept second client
         connection2, addr2 = s.accept()
-        connection2.send('Connected to server, waiting on your opponent'.encode())
+        send_msg(connection2, 'Connected to server, waiting on your opponent')
         print ('Client {} is connected'.format(addr2))
         # Create players
         playerSwitch = 'white' if randint(0, 1) is 0 else 'black'

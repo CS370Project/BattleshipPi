@@ -41,6 +41,7 @@ class Player:
     # Sends a msg to the client socket
     def send (self, msg):
         msg = struct.pack('>I', len(msg)) + msg.encode()
+        print (msg)
         self.connection.sendall(msg)
 
     # Receives a msg on the client socket as a string
