@@ -48,31 +48,31 @@ class BattleShipServer:
                 continue
             # hit a ship
             if move in otherPlayer.boardMap:
-                currentPlayer.send('hit\n')
+                currentPlayer.send('hit')
                 # Update the previous shots and ship hp          
                 ship = otherPlayer.boardMap[move]
                 ship['hp'] = ship['hp'] - 1
                 otherPlayer.previousShots['hits'].append(move)
                 # ship sunk
                 if ship['hp'] is 0:
-                    currentPlayer.send("You sunk your opponent's {}\n".format(ship['name']))
-                    otherPlayer.send("Your opponent sunk your {}\n".format(ship['name']))
+                    currentPlayer.send("You sunk your opponent's {}".format(ship['name']))
+                    otherPlayer.send("Your opponent sunk your {}".format(ship['name']))
                     otherPlayer.shipCount = otherPlayer.shipCount - 1
                     # game over currentPlayer wins
                     if otherPlayer.shipCount is 0:
-                        self.notifyAllPlayers('Game Over\n')
-                        currentPlayer.send('Congratulations you win!\n')
-                        otherPlayer.send('Sorry you lost, better luck next time!\n')
+                        self.notifyAllPlayers('Game Over')
+                        currentPlayer.send('Congratulations you win!')
+                        otherPlayer.send('Sorry you lost, better luck next time!')
                         return
                 else:
-                    currentPlayer.send("You hit your opponent's {}\n".format(ship['name']))
-                    otherPlayer.send("Your opponent hit your {}\n".format(ship['name']))
+                    currentPlayer.send("You hit your opponent's {}".format(ship['name']))
+                    otherPlayer.send("Your opponent hit your {}".format(ship['name']))
             # miss
             else:
-                currentPlayer.send('miss\n')
+                currentPlayer.send('miss')
                 otherPlayer.previousShots['misses'].append(move)
-                currentPlayer.send('You missed at coordinates: {}\n'.format(move))
-                otherPlayer.send('Your opponent missed at coordinates: {}\n'.format(move))
+                currentPlayer.send('You missed at coordinates: {}'.format(move))
+                otherPlayer.send('Your opponent missed at coordinates: {}'.format(move))
             # Switch turns
             whiteTurn = not whiteTurn
 
@@ -106,7 +106,7 @@ class BattleShipServer:
         # Accept first client
         connection1, addr1 = s.accept()
         print ('Client {} is connected'.format(addr1))
-        connection1.send('Connected to server, waiting on your opponent\n'.encode())
+        connection1.send('Connected to server, waiting on your opponent'.encode())
         # Accept second client
         connection2, addr2 = s.accept()
         print ('Client {} is connected'.format(addr2))
@@ -115,22 +115,22 @@ class BattleShipServer:
         self.white = Player(connection1) if playerSwitch is 'white' else Player(connection2)
         self.black = Player(connection1) if playerSwitch is 'black' else Player(connection2)
         # Notify players 
-        self.notifyAllPlayers('Connected to server, both peers have connected\n')
+        self.notifyAllPlayers('Connected to server, both peers have connected')
         # Ready function
         readys = 0
         def ready (player):
             nonlocal readys
             # wait for ready
             while True:
-                player.send('Are you ready to start?\n')    
-                response = player.recv(16)    
+                player.send('Are you ready to start?')            
                 # Receive no more than 1024 bytes
                 ''' Removed for testing: board = player.getGameBoard() '''
                 board = self.gameBoardTest(player)
                 ''' ---------- '''
                 if board is not None:
                     readys += 1
-                    player.send('Ready received!\n')   
+                    player.board = board
+                    player.send('Ready received!')   
                     return
         # Use aysnc module to ask users for ready        
         async.asyncCall(ready, (self.white,))
@@ -139,7 +139,7 @@ class BattleShipServer:
         while readys != 2:
             pass
         # Notify clients about starting
-        self.notifyAllPlayers('Both peers ready, starting game!\n')
+        self.notifyAllPlayers('Both peers ready, starting game!')
         # Start game
         self.runGameLoop(stopEvent)
         # Wait and then close connections
