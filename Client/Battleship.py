@@ -94,17 +94,38 @@ def main(host, port, username):
     message = ['Welcome to BATTLESHIP!']
     clock = pygame.time.Clock()
     board = Board(REGULAR)
+    
+    # Credit to: Adam Rosenfield on stack overflow
+    # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
+    def recv_msg(sock):
+        # Read message length and unpack it into an integer
+        raw_msglen = recvall(sock, 4)
+        if not raw_msglen:
+            return None
+        msglen = struct.unpack('>I', raw_msglen)[0]
+        # Read the message data
+        return recvall(sock, msglen)
+
+    def recvall(sock, n):
+        # Helper function to recv n bytes or return None if EOF is hit
+        data = b''
+        while len(data) < n:
+            packet = sock.recv(n - len(data))
+            if not packet:
+                return None
+            data += packet
+        return data
 
     def printSocketRec (sockname, connection, stopEvent):
         nonlocal message
         while True:
             if stopEvent.is_set():
                 break
-            # https://stackoverflow.com/questions/17667903/python-socket-receive-large-amount-of-data
-            msg = connection.recv_msg(connection).decode('utf-8')
+            msg = recv_msg(connection).decode('utf-8')
             for line in msg.splitlines():
                 message.append('{}: {}'.format(sockname, line))
         connection.close()
+    
     # Create server connection
     connection_stop = threading.Event()
     connection = socket.socket()
