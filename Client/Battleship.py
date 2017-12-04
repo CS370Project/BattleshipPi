@@ -147,6 +147,10 @@ def main(host, port, username):
     while not done:
         if len(message) > 47:
             del message[0]
+        if message[-1][-11:] == "make a move":
+            turn = True
+        else:
+            turn = False
         draw_messanger(screen, message)
         if vertical:
             draw_placement(screen, 'Vertical')
@@ -180,8 +184,6 @@ def main(host, port, username):
                             
                             board_send = json.dumps([ship.__dict__ for ship in ship_collection]).encode()
                             connection.sendall(board_send)
-                            #msg = connection.recv(140).decode("utf-8")
-                            #message.append(msg)
                             ready = True
                             pygame.draw.rect(screen, BLACK, READY_BUTTON)
 
@@ -372,9 +374,12 @@ def main(host, port, username):
                                 pygame.draw.rect(screen, BLACK, DESTROYER_BUTTON)
 
                 else:
-                    board.update(grid_x, grid_y, 1)
-                    if grid_x >=0 and grid_x < 10 and grid_y >=0 and grid_y < 10:
-                        message.append(str(GRID_COORD[grid_x]) + "" + str(grid_y+1))
+                    if turn:
+                        shot = str(grid_x) + ", " + str(grid_y)
+                        connection.sendall(shot.encode())
+                        board.update(grid_x, grid_y, 1)
+                        if grid_x >=0 and grid_x < 10 and grid_y >=0 and grid_y < 10:
+                            message.append(str(GRID_COORD[grid_x]) + "" + str(grid_y+1))
         board.draw(screen)
         clock.tick(60)
         pygame.display.flip()
