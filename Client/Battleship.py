@@ -174,15 +174,16 @@ def main(host, port, username):
                 else:
                     turn = False
             if len(message[-2]) > 16:
-                print(message[-2][len(username)+2:22])
+                if message[-2][len(username)+2:23] == "Your opponent sunk":
+                    board.hit(int(message[-2][-5]), int(message[-2][-2]))
                 if message[-2][len(username)+2:22] == "Your opponent hit":
-                    board.hit(int(message[-2][-5]),int(message[-2][-2]))
+                    board.hit(int(message[-2][-5]), int(message[-2][-2]))
             if len(message[-2]) > 4:
                 if message[-2][-4:]=='miss':
-                    board.update(int(message[-1][-5]),int(message[-1][-2]), 1)
+                    board.update(int(message[-1][-5]), int(message[-1][-2]), 1)
             if len(message[-2]) > 3:
                 if message[-2][-3:]=='hit':
-                    board.update(int(message[-1][-5]),int(message[-1][-2]), 2)
+                    board.update(int(message[-1][-5]), int(message[-1][-2]), 2)
         draw_messanger(screen, message)
         if vertical:
             draw_placement(screen, 'Vertical')
@@ -469,7 +470,6 @@ class Board(object):
 
     def update(self, column, row, value):
         '''Updates client board to display server information'''
-        print("Click Grid Coordinates: ", column, row)
         if value == 3:
             if row > self.size and not column > self.size-1 and not row > (self.size * 2):
                 self.local_grid[row-(self.size+1)][column] = value
