@@ -166,10 +166,14 @@ def main(host, port, username):
     while not done:
         if len(message) > 47:
             del message[0]
-        if message[-1][-11:] == "make a move":
-            turn = True
-        else:
-            turn = False
+        if len(message[-2]) > 18:
+            if message[-1][-11:] == "make a move" or message[-1][-18] == "try somewhere else":
+                turn = True
+            else:
+                turn = False
+        if len(message[-2]) > 16:
+            if message[-2][:16] == "Your opponent hit":
+                board.hit(int(message[-2][-5]),int(message[-2][-2]))
         draw_messanger(screen, message)
         if vertical:
             draw_placement(screen, 'Vertical')
@@ -394,12 +398,17 @@ def main(host, port, username):
 
                 else:
                     if turn:
-                        shot = str(grid_x) + ', ' + str(grid_y)
-                        print(shot)
-                        connection.send(shot.encode())
-                        board.update(grid_x, grid_y, 1)
                         if grid_x >=0 and grid_x < 10 and grid_y >=0 and grid_y < 10:
+                            shot = str(grid_x) + ', ' + str(grid_y)
+                            print(shot)
                             message.append("Fire at: " + str(GRID_COORD[grid_x]) + "" + str(grid_y+1))
+                            connection.send(shot.encode())
+                            if len(message[-2]) > 4:
+                                if message[-2][-4]=='miss':
+                                    board.update(grid_x, grid_y, 1)
+                            if len(message[-2]) > 3:
+                                if message[-2][-3]=='hit':
+                                    board.update(grid_x, grid_y, 2)
         board.draw(screen)
         clock.tick(60)
         pygame.display.flip()
@@ -445,6 +454,9 @@ class Board(object):
                     tile_color = GRAY
                 pygame.draw.rect(screen, tile_color, [(MARGIN + WIDTH) * column + MARGIN, \
                     (MARGIN + HEIGHT) * row + MARGIN + local_grid_location, WIDTH, HEIGHT])
+
+    def hit(self, column, row):
+        self.local_grid[row][column] = 2
 
     def update(self, column, row, value):
         '''Updates client board to display server information'''

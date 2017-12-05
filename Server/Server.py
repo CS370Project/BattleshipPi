@@ -65,7 +65,7 @@ class BattleShipServer:
                         return
                 else:
                     currentPlayer.send("You hit your opponent's {}".format(ship['name']))
-                    otherPlayer.send("Your opponent hit your {}".format(ship['name']))
+                    otherPlayer.send("Your opponent hit your {} at coordinates: {}".format(ship['name'], move))
             # miss
             else:
                 currentPlayer.send('miss')
