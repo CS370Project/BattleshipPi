@@ -2,6 +2,7 @@ import socket
 import time
 import async
 import sys
+import struct
 from random import randint
 from player import Player
 

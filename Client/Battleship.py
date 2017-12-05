@@ -123,6 +123,7 @@ def main(host, port, username):
             if stopEvent.is_set():
                 break
             msg = recv_msg(connection).decode('utf-8')
+            print(msg)
             for line in msg.splitlines():
                 message.append('{}: {}'.format(sockname, line))
         connection.close()
@@ -166,14 +167,15 @@ def main(host, port, username):
     while not done:
         if len(message) > 47:
             del message[0]
-        if len(message[-2]) > 18:
-            if message[-1][-11:] == "make a move" or message[-1][-18] == "try somewhere else":
-                turn = True
-            else:
-                turn = False
-        if len(message[-2]) > 16:
-            if message[-2][:16] == "Your opponent hit":
-                board.hit(int(message[-2][-5]),int(message[-2][-2]))
+        if len(message) > 2:
+            if len(message[-2]) > 18:
+                if message[-1][-11:] == "make a move" or message[-1][-18] == "try somewhere else":
+                    turn = True
+                else:
+                    turn = False
+            if len(message[-2]) > 16:
+                if message[-2][:16] == "Your opponent hit":
+                    board.hit(int(message[-2][-5]),int(message[-2][-2]))
         draw_messanger(screen, message)
         if vertical:
             draw_placement(screen, 'Vertical')
@@ -404,10 +406,10 @@ def main(host, port, username):
                             message.append("Fire at: " + str(GRID_COORD[grid_x]) + "" + str(grid_y+1))
                             connection.send(shot.encode())
                             if len(message[-2]) > 4:
-                                if message[-2][-4]=='miss':
+                                if message[-2][-4:]=='miss':
                                     board.update(grid_x, grid_y, 1)
                             if len(message[-2]) > 3:
-                                if message[-2][-3]=='hit':
+                                if message[-2][-3:]=='hit':
                                     board.update(grid_x, grid_y, 2)
         board.draw(screen)
         clock.tick(60)
