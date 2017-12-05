@@ -169,13 +169,20 @@ def main(host, port, username):
             del message[0]
         if len(message) > 2:
             if len(message[-2]) > 18:
-                if message[-1][-11:] == "make a move" or message[-1][-18] == "try somewhere else":
+                if message[-1][-11:] == "make a move" or message[-1][-18:] == "try somewhere else":
                     turn = True
                 else:
                     turn = False
             if len(message[-2]) > 16:
-                if message[-2][:16] == "Your opponent hit":
+                print(message[-2][len(username)+2:22])
+                if message[-2][len(username)+2:22] == "Your opponent hit":
                     board.hit(int(message[-2][-5]),int(message[-2][-2]))
+            if len(message[-2]) > 4:
+                if message[-2][-4:]=='miss':
+                    board.update(int(message[-1][-5]),int(message[-1][-2]), 1)
+            if len(message[-2]) > 3:
+                if message[-2][-3:]=='hit':
+                    board.update(int(message[-1][-5]),int(message[-1][-2]), 2)
         draw_messanger(screen, message)
         if vertical:
             draw_placement(screen, 'Vertical')

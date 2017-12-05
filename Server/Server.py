@@ -65,7 +65,7 @@ class BattleShipServer:
                         otherPlayer.send('Sorry you lost, better luck next time!')
                         return
                 else:
-                    currentPlayer.send("You hit your opponent's {}".format(ship['name']))
+                    currentPlayer.send("You hit your opponent's {} at coordinates: {}".format(ship['name'], move))
                     otherPlayer.send("Your opponent hit your {} at coordinates: {}".format(ship['name'], move))
             # miss
             else:
